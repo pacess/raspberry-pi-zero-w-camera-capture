@@ -5,6 +5,7 @@
 ##  Copyright Pacess Studio, 2020.  All rights reserved.
 ##----------------------------------------------------------------------------------------
 
+from gpiozero import CPUTemperature
 from picamera import PiCamera
 from datetime import datetime
 from flask import send_file
@@ -21,6 +22,7 @@ _app = flask.Flask(__name__)
 _app.config["DEBUG"] = True
 
 ##----------------------------------------------------------------------------------------
+##  Take a picture
 @_app.route("/api/capture", methods=["GET"])
 def apiCapture():
 	
@@ -45,6 +47,13 @@ def apiCapture():
 	camera.close()
 
 	return send_file(filePath, mimetype="image/jpeg")
+
+##----------------------------------------------------------------------------------------
+##  Show CPU temperature
+@_app.route("/api/temperature", methods=["GET"])
+def apiCPUTemperature():
+	cpu = CPUTemperature()
+	return str(cpu.temperature)
 
 ##----------------------------------------------------------------------------------------
 _app.run(host="0.0.0.0", port=80)
