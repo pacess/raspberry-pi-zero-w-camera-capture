@@ -1,6 +1,7 @@
 ##----------------------------------------------------------------------------------------
 ##  Camera Capture Server v1.00
 ##----------------------------------------------------------------------------------------
+##  Platform: Raspberry Pi Zero W + Python 3.7
 ##  Written by Pacess HO
 ##  Copyright Pacess Studio, 2020.  All rights reserved.
 ##----------------------------------------------------------------------------------------
@@ -29,14 +30,22 @@ def apiCapture():
 	camera = PiCamera()
 	#camera.resolution = (2592, 1944)
 	camera.resolution = (1296, 972)
+	camera.iso = 400
 
 	##  Camera warm-up time
 	camera.start_preview()
 	sleep(2)
 
 	now = datetime.now()
-	timestamp = now.strftime("%Y%m%d_%H%M%S")
+	hour = int(now.strftime("%H"))
 
+	if (hour >= 7 and hour <= 15):
+		camera.iso = 100
+
+	if (hour >= 16 and hour <= 18):
+		camera.iso = 200
+
+	timestamp = now.strftime("%Y%m%d_%H%M%S")
 	folder = _folder+now.strftime("%Y%m")
 	if not os.path.exists(folder):
 		os.mkdir(folder)
