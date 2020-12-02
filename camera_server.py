@@ -10,6 +10,7 @@ from gpiozero import CPUTemperature
 from picamera import PiCamera
 from datetime import datetime
 from flask import send_file
+from picamera import Color
 from time import sleep
 import shutil
 import flask
@@ -28,9 +29,9 @@ _app.config["DEBUG"] = True
 def apiCapture():
 	
 	camera = PiCamera()
-	#camera.resolution = (2592, 1944)
-	camera.resolution = (1296, 972)
-	camera.iso = 400
+	camera.resolution = (2592, 1944)
+	#camera.resolution = (1296, 972)
+	camera.iso = 1600
 
 	##  Camera warm-up time
 	camera.start_preview()
@@ -39,19 +40,28 @@ def apiCapture():
 	now = datetime.now()
 	hour = int(now.strftime("%H"))
 
-	if (hour >= 7 and hour <= 15):
+	if (hour >= 7 and hour <= 14):
 		camera.iso = 100
 
-	if (hour >= 16 and hour <= 18):
+	if (hour >= 15 and hour <= 16):
 		camera.iso = 200
 
-	timestamp = now.strftime("%Y%m%d_%H%M%S")
+	if (hour >= 17 and hour <= 18):
+		camera.iso = 400
+
 	folder = _folder+now.strftime("%Y%m")
 	if not os.path.exists(folder):
 		os.mkdir(folder)
 
+	timestamp = now.strftime("%Y%m%d_%H%M%S")
 	imageFile = timestamp+'.jpg'
 	filePath = folder+"/"+imageFile
+
+	string = now.strftime(" %Y-%m-%d %H:%M:%S")+" @Raspberry Pi Zero W "
+	camera.annotate_foreground = Color('black')
+	camera.annotate_background = Color('white')
+	camera.annotate_text = string
+
 	camera.capture(filePath)
 	camera.close()
 
